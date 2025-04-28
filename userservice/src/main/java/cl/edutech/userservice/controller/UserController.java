@@ -44,8 +44,44 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User userRequest) {
-        User createdUser = userService.create(userRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    public ResponseEntity<MessageResponse> createUser(@RequestBody User userRequest) {
+        List<User> userList = userService.findAll();
+        for(User user : userList) {
+            if(user.getRut().equals(userRequest.getRut())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("USER WAS EXISTS"));
+            }
+        }
+        userService.create(userRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("USER CREATED"));
     }
+
+    @PutMapping("/{rutRequest}")
+    public ResponseEntity<MessageResponse> updateUser(@PathVariable String rutRequest, @RequestBody User userRequest) {
+        List<User> userList = userService.findAll();
+        for(User user : userList) {
+            if(user.getRut().equals(rutRequest)) {
+                userService.remove(rutRequest);
+                userService.create(userRequest);
+                return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("USER WAS UPDATED"));
+            } else {
+                break;
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
+    }
+
+
+   @DeleteMapping("/{rutRequest}")
+    public ResponseEntity<MessageResponse> deleteUser(@PathVariable String rutRequest) {
+        List<User> userList = userService.findAll();
+        for(User user : userList) {
+            if(user.getRut().equals(rutRequest)) {
+                userService.remove(rutRequest);
+                return ResponseEntity.ok(new MessageResponse("User deleted"));
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("User Does Not Exist"));
+    }
+
+
 }
