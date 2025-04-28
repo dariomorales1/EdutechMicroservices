@@ -18,6 +18,11 @@ public class UserController {
     private UserService userService;
 
 
+    @GetMapping("/ping")
+    public ResponseEntity<MessageResponse> ping() {
+        return ResponseEntity.ok(new MessageResponse("PONG"));
+    }
+
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> userList = userService.findAll();
@@ -28,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping("/{rutRequest}")
-    public ResponseEntity<User> searchUser(@PathVariable Long rutRequest) {
+    public ResponseEntity<User> searchUser(@PathVariable String rutRequest) {
         try {
             User user = userService.findByRut(rutRequest);
             return ResponseEntity.ok(user);
@@ -39,9 +44,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<MessageResponse> createUser(@RequestBody User userRequest) {
-        userService.create(userRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("User created successfully"));
+    public ResponseEntity<User> createUser(@RequestBody User userRequest) {
+        User createdUser = userService.create(userRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
-
 }

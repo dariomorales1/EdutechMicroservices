@@ -19,7 +19,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User findByRut(Long rut) {
+    public User findByRut(String rut) {
         return userRepository.findById(rut).get();
     }
 
@@ -27,7 +27,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void remove(Long rut) {
+    public void remove(String rut) {
         userRepository.deleteById(rut);
     }
 
