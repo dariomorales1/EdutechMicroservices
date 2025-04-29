@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>cl.edutech</groupId>
-    <artifactId>hola</artifactId>
+    <artifactId>EduTechMicroservices</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>hola</name>
-    <description>hola</description>
+    <name>EduTechMicroservices</name>
+    <description>EduTechMicroservices</description>
     <packaging>pom</packaging>
     <url/>
     <licenses>
