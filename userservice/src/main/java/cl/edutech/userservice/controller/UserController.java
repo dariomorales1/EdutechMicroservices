@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+
 public class UserController {
 
     @Autowired
@@ -82,6 +83,25 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("User Does Not Exist"));
     }
+
+    // Endpoint para obtener usuarios por su rol (por ejemplo, Instructores)
+    @GetMapping("/role/{role}")
+    public ResponseEntity<List<User>> getUsersByRole(@PathVariable String role) {
+        List<User> usersList = userService.findByRole(role);
+        if (usersList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);  // Retorna error si no se encuentran usuarios con el rol especificado
+        }
+        return ResponseEntity.ok(usersList);
+    }
+    /*
+    @GetMapping("/role/{role}")
+    public ResponseEntity<List<User>> getUsersByRole(@PathVariable String role) {
+        if (role == null || role.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);  // Retorna error si el role está vacío o nulo
+        }
+        List<User> users = userService.findByRole(role);
+        return ResponseEntity.ok(users);
+    }*/
 
 
 }

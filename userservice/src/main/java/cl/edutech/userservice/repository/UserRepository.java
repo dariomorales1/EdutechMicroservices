@@ -5,4 +5,5 @@ import cl.edutech.userservice.model.User;
 
 public interface UserRepository extends JpaRepository<User, String> {
 
+    User findByRoleContains(String role);
 }

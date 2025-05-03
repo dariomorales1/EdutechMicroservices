@@ -31,4 +31,10 @@ public class UserService {
         userRepository.deleteById(rut);
     }
 
+    public List<User> findByRole(String role) {
+        List<User> userList = userRepository.findAll();
+        return userList.stream()
+                .filter(user -> user.getRole().contains(role))
+                .toList();
+    }
 }
