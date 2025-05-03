@@ -93,15 +93,4 @@ public class UserController {
         }
         return ResponseEntity.ok(usersList);
     }
-    /*
-    @GetMapping("/role/{role}")
-    public ResponseEntity<List<User>> getUsersByRole(@PathVariable String role) {
-        if (role == null || role.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);  // Retorna error si el role está vacío o nulo
-        }
-        List<User> users = userService.findByRole(role);
-        return ResponseEntity.ok(users);
-    }*/
-
-
 }
