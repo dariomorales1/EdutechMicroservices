@@ -20,14 +20,17 @@ public class UserService {
     }
 
     public User findByRut(String rut) {
+
         return userRepository.findById(rut).get();
     }
 
     public User create(User user) {
+
         return userRepository.save(user);
     }
 
     public void remove(String rut) {
+
         userRepository.deleteById(rut);
     }
 
