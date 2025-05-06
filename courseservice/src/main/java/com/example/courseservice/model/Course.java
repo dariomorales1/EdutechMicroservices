@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Entity
 @Table(name = "courses")
 @AllArgsConstructor
@@ -26,10 +24,10 @@ public class Course {
     @Column
     private String description;
 
-    @Column
-    private Date date;
+//    @Column
+//    private String date;
 
-    @Column
-    private String instructorId;
+//    @Column
+//    private String instructorId;
 
 }
