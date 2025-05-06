@@ -83,5 +83,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("User Does Not Exist"));
     }
 
+    // Metodo para validar tokens
 
+    @PostMapping("/validate")
+    public ResponseEntity<Boolean> validateUser(@RequestParam String emailRequest, @RequestParam String passwordRequest) {
+       List<User> userList = userService.findAll();
+       for(User user : userList) {
+           if(user.getEmail().equals(emailRequest) && user.getPassword().equals(passwordRequest)) {
+               return ResponseEntity.ok(true);
+           }
+       }
+       return ResponseEntity.ok(false);
+    }
 }
