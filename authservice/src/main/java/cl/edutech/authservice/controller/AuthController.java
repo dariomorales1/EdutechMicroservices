@@ -1,6 +1,7 @@
 package cl.edutech.authservice.controller;
 
 import cl.edutech.authservice.controller.Responsive.MessageResponsive;
+import cl.edutech.authservice.model.Token;
 import cl.edutech.authservice.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,9 @@ public class AuthController {
     public ResponseEntity<MessageResponsive> login(@RequestParam String emailRequest, @RequestParam String passwordRequest) {
             boolean isAutenticated = authService.validateUser(emailRequest, passwordRequest);
             if (isAutenticated) {
+                String id = authService.generateTokenId();
+                Token token = new Token(id, emailRequest, passwordRequest);
+                authService.create(token);
                 return ResponseEntity.status(HttpStatus.OK).body(new MessageResponsive("success"));
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponsive("error"));
