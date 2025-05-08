@@ -4,6 +4,7 @@ import cl.edutech.enrollmentservice.model.Enrollment;
 import cl.edutech.enrollmentservice.repository.EnrollmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
