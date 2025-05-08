@@ -1,40 +1,25 @@
 package cl.edutech.evaluationservice.service;
 
 import cl.edutech.evaluationservice.model.Evaluation;
+import cl.edutech.evaluationservice.repository.EvaluationRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/evaluations")
-
+@Service
+@Transactional
 public class EvaluationService {
 
     @Autowired
-    private EvaluationService evaluationService;
+    private EvaluationRepository evaluationRepository;
 
-    @PostMapping
-    public Evaluation createEvalaution(@RequestBody Evaluation evaluation) {
-        return evaluationService.saveEvaluation(evaluation);
-    }
+    public List<Evaluation> findAll(){return evaluationRepository.findAll();}
 
-    @GetMapping
-    public List <Evaluation> getEvaluations() {
-        return evaluationService.getAllEvaluations();
-    }
+    public Evaluation findById(String id){return evaluationRepository.findById(id).get();}
 
-    @GetMapping("/{id}")
-        public Optional<Evaluation> getEvaluationById(@PathVariable String id){
-        return evaluationService.getEvaluationById(id);
-        }
+    public Evaluation create (Evaluation evaluation){return evaluationRepository.save(evaluation);}
 
-    @GetMapping("/name/{name}")
-    public List <Evaluation> getEvaluationsByName(@PathVariable String name){
-        return evaluationService.getEvaluationsByName(name);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteEvaluation(@)
+    public void remove (String id){evaluationRepository.deleteById(id);}
 }
