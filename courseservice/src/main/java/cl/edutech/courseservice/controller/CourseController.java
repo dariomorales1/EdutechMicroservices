@@ -62,11 +62,8 @@ public class CourseController {
                 courseService.remove(courseId);
                 courseService.create(courseRequest);
                 return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("COURSE UPDATED"));
-            }  else {
-                break;
             }
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
+        } return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
     }
 
     @DeleteMapping("/{courseId}")
@@ -76,10 +73,7 @@ public class CourseController {
             if(course.getCourseId().equals(courseId)){
                 courseService.remove(courseId);
                 return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("COURSE DELETED"));
-            }  else {
-                break;
             }
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
+        }return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
     }
 }

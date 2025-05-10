@@ -56,16 +56,13 @@ public class BillingController {
     @PutMapping("/{billingId}")
     public ResponseEntity<MessageResponse> updateBilling(@PathVariable Integer billingId, @RequestBody Billing billingRequest) {
         List<Billing> billingList = billingService.findAll();
-        for (Billing billing : billingList){
-            if(billing.getBillingId().equals(billingId)){
+        for (Billing billing : billingList) {
+            if (billing.getBillingId().equals(billingId)) {
                 billingService.remove(billingId);
                 billingService.create(billingRequest);
-                return ResponseEntity.ok(new MessageResponse("BILLING UPDATED"));
-            } else{
-                break;
+                return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("BILLING UPDATED"));
             }
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("BILLING NOT FOUND"));
+        } return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("BILLING NOT FOUND"));
     }
 
     @DeleteMapping("/{billingId}")
@@ -75,10 +72,7 @@ public class BillingController {
             if(billing.getBillingId().equals(billingId)){
                 billingService.remove(billingId);
                 return ResponseEntity.ok(new MessageResponse("BILLING REMOVED"));
-            } else{
-                break;
             }
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("BILLING NOT FOUND"));
+        }return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("BILLING NOT FOUND"));
     }
 }
