@@ -31,8 +31,10 @@
     <modules>
         <module>userservice</module>
         <module>authservice</module>
+        <module>courseservice</module>
         <module>enrollmentservice</module>
         <module>supportservice</module>
+      <module>billingservice</module>
     </modules>
 
     <properties>
