@@ -32,6 +32,7 @@
         <module>userservice</module>
         <module>authservice</module>
         <module>enrollmentservice</module>
+        <module>supportservice</module>
     </modules>
 
     <properties>
