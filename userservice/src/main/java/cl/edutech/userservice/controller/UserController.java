@@ -95,4 +95,15 @@ public class UserController {
        }
        return ResponseEntity.ok(false);
     }
+
+    @PostMapping("/validate/rut")
+    public ResponseEntity<Boolean> validateUserRut(@RequestParam String rutRequest) {
+        List<User> userList = userService.findAll();
+        for(User user : userList) {
+            if(user.getRut().equals(rutRequest)) {
+                return ResponseEntity.ok(true);
+            }
+        }
+        return ResponseEntity.ok(false);
+    }
 }
