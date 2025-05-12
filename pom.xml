@@ -33,8 +33,9 @@
         <module>authservice</module>
         <module>courseservice</module>
         <module>enrollmentservice</module>
+        <module>evaluationservice</module>
         <module>supportservice</module>
-      <module>billingservice</module>
+        <module>billingservice</module>
     </modules>
 
     <properties>
