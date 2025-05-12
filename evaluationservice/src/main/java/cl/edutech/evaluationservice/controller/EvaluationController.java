@@ -40,7 +40,7 @@ public class EvaluationController {
         }
     }
 
-    @PostMapping("/Create")
+    @PostMapping
     public ResponseEntity<MessageResponse> createEvaluation(@RequestBody Evaluation evaluation) {
         List<Evaluation> evaluationList = evaluationService.findAll();
         for (Evaluation existingEvaluation : evaluationList) {
@@ -49,6 +49,7 @@ public class EvaluationController {
             }
         }
         evaluationService.create(evaluation);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Evaluation created"));
     }
 
