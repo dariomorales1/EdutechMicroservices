@@ -8,10 +8,10 @@
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
-    <artifactId>enrollmentservice</artifactId>
+    <artifactId>supportservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>enrollmentservice</name>
-    <description>enrollmentservice</description>
+    <name>supportservice</name>
+    <description>supportservice</description>
     <url/>
     <licenses>
         <license/>
