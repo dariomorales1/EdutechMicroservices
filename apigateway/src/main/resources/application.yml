@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    web-application-type: reactive
+
+  application:
+    name: apigateway
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  cloud:
+    gateway:
+      routes:
+        - id: userservice
+          uri: http://localhost:8082
+          predicates:
+            - Path=/users/**
+
+        - id: authservice
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**
+
+        - id: courseservice
+          uri: http://localhost:8083
+          predicates:
+            - Path=/courses/**
+
+        - id: enrollmentservice
+          uri: http://localhost:8084
+          predicates:
+            - Path=/enroll/**
+
+        - id: evaluationservice
+          uri: http://localhost:8085
+          predicates:
+            - Path=/evaluations/**
+
+        - id: billingservice
+          uri: http://localhost:8086
+          predicates:
+            - Path=/billings/**
+
+        - id: supportservice
+          uri: http://localhost:8087
+          predicates:
+            - Path=/support/**
