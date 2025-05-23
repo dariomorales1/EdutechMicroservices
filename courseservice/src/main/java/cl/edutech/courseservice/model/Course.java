@@ -24,10 +24,4 @@ public class Course {
     @Column
     private String description;
 
-//    @Column
-//    private String date;
-
-//    @Column
-//    private String instructorId;
-
 }

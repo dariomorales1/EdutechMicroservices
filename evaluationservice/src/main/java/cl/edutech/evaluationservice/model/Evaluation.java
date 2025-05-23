@@ -18,14 +18,15 @@ public class Evaluation {
     private String evaluationId;
 
     @Column
-    private String nameEvaluation;
+    private String evaluationName;
 
     @Column
-    private String description;
-
-//    @Column
-//    private String date;
+    private String StudentId;
 
     @Column
     private String courseId;
+
+    @Column
+    private Double score;
+
 }
