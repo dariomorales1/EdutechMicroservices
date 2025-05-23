@@ -1,11 +1,15 @@
 package cl.edutech.authservice.service;
 
+import cl.edutech.authservice.DTO.LoginRequest;
+import cl.edutech.authservice.DTO.UserDTO;
 import cl.edutech.authservice.model.Token;
 import cl.edutech.authservice.repository.AuthRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -13,31 +17,36 @@ import java.util.List;
 @Transactional
 public class AuthService {
 
+    private final WebClient userWebClient;
+
+    public AuthService(WebClient webClient) {
+        this.userWebClient = webClient;
+    }
+
+
+    public UserDTO getUser(String emailRequest) {
+        UserDTO user = userWebClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/email/{emailRequest}").build(emailRequest))
+                .retrieve()
+                .bodyToMono(UserDTO.class)
+                .block();
+        return user;
+    }
+
+
+
     @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
     private AuthRepository authRepository;
 
-    public boolean validateUser(String emailRequest, String passwordRequest) {
-        String userServiceUrl = "http://localhost:8082/users/validate?emailRequest=" + emailRequest+ "&passwordRequest=" + passwordRequest;
-
-        try {
-            Boolean isValid = restTemplate.postForObject(userServiceUrl,null, Boolean.class);
-            return isValid != null && isValid;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public String pingUserService() {
-        String userServiceUrl = "http://localhost:8082/users/ping";
-        try {
-            return restTemplate.getForObject(userServiceUrl, String.class);
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
-        }
+    public ResponseEntity<String> pingUserService() {
+        return userWebClient.get()
+                .uri("/ping")
+                .retrieve()
+                .toEntity(String.class)
+                .block();
     }
 
     // Creacion del Token automatico
@@ -48,15 +57,14 @@ public class AuthService {
         return "Token" + tokenCounter++;
     }
 
-    //CRUD DB
 
-    //Create
+
+    //CRUD DB ------------------------------------------------------------------------------------
+
 
     public Token create(Token token) {
         return authRepository.save(token);
     }
-
-    //Read
 
     public List<Token> findAll(){
         return authRepository.findAll();
@@ -65,8 +73,6 @@ public class AuthService {
     public Token findById(String id) {
         return authRepository.findById(id).get();
     }
-
-    //Remove
 
     public void remove(String id) {
         authRepository.deleteById(id);

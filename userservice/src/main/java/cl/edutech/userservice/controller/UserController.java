@@ -43,6 +43,17 @@ public class UserController {
 
     }
 
+    @GetMapping("/email/{emailRequest}")
+    public ResponseEntity<User> searchUserByEmail(@PathVariable String emailRequest) {
+        try {
+            User user = userService.findByEmail(emailRequest);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+    }
+
     @PostMapping
     public ResponseEntity<MessageResponse> createUser(@RequestBody User userRequest) {
         List<User> userList = userService.findAll();

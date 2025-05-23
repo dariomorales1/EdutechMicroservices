@@ -61,83 +61,59 @@ public class EnrollmentController {
         return ResponseEntity.ok(enrollmentList);
     }
 
-    @GetMapping("/{idRequest}")
-    public ResponseEntity<Enrollment> searchEnrollment(@PathVariable Integer idRequest) {
-        Enrollment enrollment = enrollmentService.findById(idRequest);
-        if (enrollment == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(enrollment);
-    }
-
     @PostMapping
-    public ResponseEntity<MessageResponse> create(@RequestBody Enrollment enrollment) {
-//        List<Enrollment> enrollmentList = enrollmentService.findAll();
-//
-//        // Validacion si existe el enrollment
-//        for (Enrollment e : enrollmentList) {
-//            if (e.getId().equals(enrollment.getId())) {
-//                return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("ENROLLMENT WAS EXISTS"));
-//            } else {
-//                //Validar si existe el user
-
-        Enrollment existingEnrollment = enrollmentService.findById(enrollment.getId());
-        if (existingEnrollment != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("Enrollment already exists"));
+    public ResponseEntity<?> createEnrollment(@RequestBody Enrollment enrollment) {
+        Enrollment enrollExist = enrollmentService.findById(enrollment.getId());
+        UserDTO user = enrollmentService.getUser(enrollment.getStudentRut());
+        CourseDTO course = enrollmentService.getCourse(enrollment.getCourseId());
+        if (enrollExist != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("ENROLLMENT ALREADY EXISTS"));
+        } else if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
+        } else if (course == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
         }
-
-        boolean isAutenticatedRut = enrollmentService.validateUserRut(enrollment.getStudentRut());
-                /*
-                FALTA LA PARTE DEL FELIPE PARA SEGUIR
-
-                boolean isAutenticatedCourse = enrollmentService.validateCourseId(String.valueOf(enrollment.getCourseId()))*/
-
-        if (!isAutenticatedRut /*&& isAutenticatedCourse*/) {
-
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("User Not Exists"));
-        }
-
         enrollmentService.create(enrollment);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("ENROLLMENT CREATED"));
-
-
-
-                /*enrollmentService.create(enrollment);
-                return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("ENROLLMENT CREATED"));*/
-
-
     }
+
     @GetMapping("/ping-user")
     public ResponseEntity<MessageResponse> pingUserService() {
-        String response = enrollmentService.pingUserService();
-        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(response));
+        ResponseEntity<String> userResponse = enrollmentService.pingUserService();
+        if (userResponse.getStatusCode() == HttpStatus.OK) {
+            return ResponseEntity.ok(new MessageResponse("PONG"));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("USER SERVICE NOT AVAILABLE"));
+        }
     }
 
     @PutMapping("/{idRequest}")
     public ResponseEntity<MessageResponse> updateEnrollment(@PathVariable Integer idRequest, @RequestBody Enrollment enrollment) {
-        List<Enrollment> enrollmentList = enrollmentService.findAll();
-        for (Enrollment e : enrollmentList) {
-            if (e.getId().equals(idRequest)) {
-                enrollmentService.remove(idRequest);
-                enrollmentService.create(enrollment);
-                return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("ENROLLMENT UPDATED"));
-            }
+        Enrollment enrollExist = enrollmentService.findById(idRequest);
+        UserDTO user = enrollmentService.getUser(enrollment.getStudentRut());
+        CourseDTO course = enrollmentService.getCourse(enrollment.getCourseId());
+        if (enrollExist == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
+        } else if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
+        } else if (course == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
+        } else {
+            enrollmentService.remove(idRequest);
+            enrollmentService.create(enrollment);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("ENROLLMENT UPDATED"));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
-
     }
 
     @DeleteMapping("/{idRequest}")
     public ResponseEntity<MessageResponse> deleteEnrollment(@PathVariable Integer idRequest) {
-        List<Enrollment> enrollmentList = enrollmentService.findAll();
-        for (Enrollment e : enrollmentList) {
-            if(e.getId().equals(idRequest)) {
-                enrollmentService.remove(idRequest);
-                return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("ENROLLMENT DELETED"));
-            }
+        Enrollment enrollExist = enrollmentService.findById(idRequest);
+        if (enrollExist == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
+        } else {
+            enrollmentService.remove(idRequest);
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("ENROLLMENT DELETED"));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
     }
 }
 
