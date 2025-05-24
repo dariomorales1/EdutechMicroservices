@@ -19,8 +19,11 @@ public class Enrollment {
     private Integer id;
 
     @Column
-    private String studentRut;
+    private String userRut;
 
     @Column
     private String courseId;
+
+    @Column
+    private String message;
 }

@@ -8,10 +8,12 @@ import cl.edutech.enrollmentservice.repository.EnrollmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -31,7 +33,12 @@ public class EnrollmentService {
         UserDTO user = userWebClient.get()
                             .uri(uriBuilder -> uriBuilder.path("/{rutRequest}").build(rutRequest))
                             .retrieve()
+                            .onStatus(
+                                    HttpStatusCode::is4xxClientError,
+                                    clientResponse -> clientResponse.bodyToMono(String.class).then(Mono.empty())
+                            )
                             .bodyToMono(UserDTO.class)
+                            .onErrorResume(e -> Mono.empty())
                             .block();
         return user;
     }
@@ -40,7 +47,12 @@ public class EnrollmentService {
         CourseDTO course = courseWebClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/{courseIdRequest}").build(courseIdRequest))
                 .retrieve()
+                .onStatus(
+                        HttpStatusCode::is4xxClientError,
+                        clientResponse -> clientResponse.bodyToMono(String.class).then(Mono.empty())
+                )
                 .bodyToMono(CourseDTO.class)
+                .onErrorResume(e -> Mono.empty())
                 .block();
         return course;
     }

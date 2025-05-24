@@ -47,5 +47,4 @@ public class AuthController {
         ResponseEntity<String> response = authService.pingUserService();
         return ResponseEntity.ok(response.getBody());
     }
-
 }

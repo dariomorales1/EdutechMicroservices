@@ -22,6 +22,9 @@ public class SupportTicket {
     private String userRut;
 
     @Column
+    private String courseId;
+
+    @Column
     private String description;
 
     @Column

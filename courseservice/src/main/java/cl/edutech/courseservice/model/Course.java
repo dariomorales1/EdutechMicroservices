@@ -24,4 +24,7 @@ public class Course {
     @Column
     private String description;
 
+    @Column
+    private Integer price;
+
 }
