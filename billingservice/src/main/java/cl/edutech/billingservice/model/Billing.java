@@ -19,21 +19,15 @@ public class Billing {
     private Integer billingId;
 
     @Column
-    private Integer userId;
+    private String userId;
 
     @Column
-    private Integer courseId;
+    private String courseId;
 
     @Column
-    private Double amount;
-
-    @Column
-    private String status;
+    private String enrollmentId;
 
     @Column
     private String description;
-
-    @Column
-    private String issueDate;
 
 }
