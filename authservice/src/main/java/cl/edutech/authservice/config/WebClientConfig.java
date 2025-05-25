@@ -9,7 +9,7 @@ public class WebClientConfig {
     @Bean
     public WebClient userWebClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8080/users")
+                .baseUrl("http://apigateway:8080/users")
                 //.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) <- Actualizar cn los datos de api key
                 .build();
     }
