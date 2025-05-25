@@ -17,36 +17,36 @@ spring:
     gateway:
       routes:
         - id: authservice
-          uri: http://localhost:8081
+          uri: http://authservice:8081
           predicates:
             - Path=/auth/**
 
         - id: userservice
-          uri: http://localhost:8082
+          uri: http://userservice:8082
           predicates:
             - Path=/users/**
 
         - id: courseservice
-          uri: http://localhost:8083
+          uri: http://courseservice:8083
           predicates:
             - Path=/courses/**
 
         - id: enrollmentservice
-          uri: http://localhost:8084
+          uri: http://enrollmentservice:8084
           predicates:
             - Path=/enroll/**
 
         - id: evaluationservice
-          uri: http://localhost:8085
+          uri: http://evaluationservice:8085
           predicates:
             - Path=/evaluations/**
 
         - id: billingservice
-          uri: http://localhost:8086
+          uri: http://billingservice:8086
           predicates:
             - Path=/billings/**
 
         - id: supportservice
-          uri: http://localhost:8087
+          uri: http://supportservice:8087
           predicates:
             - Path=/support/**

@@ -25,9 +25,6 @@ public class Billing {
     private String courseId;
 
     @Column
-    private String enrollmentId;
-
-    @Column
-    private String description;
+    private Integer enrollmentId;
 
 }

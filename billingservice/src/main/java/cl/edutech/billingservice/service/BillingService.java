@@ -56,7 +56,7 @@ public class BillingService {
         return course;
     }
 
-    public EnrollmentDTO getEnrollment(String enrollmentIdRequest) {
+    public EnrollmentDTO getEnrollment(Integer enrollmentIdRequest) {
         EnrollmentDTO enrollment = enrollmentWebClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/{enrollmentIdRequest}").build(enrollmentIdRequest))
                 .retrieve()
@@ -82,9 +82,7 @@ public class BillingService {
         return billingRepository.findAll();
     }
 
-    public Billing findById(Integer id) {
-        return billingRepository.findById(id).get();
-    }
+    public Billing findById(Integer id) {return billingRepository.findById(id).orElse(null);}
 
     public Billing create(Billing billing) {
         return billingRepository.save(billing);
