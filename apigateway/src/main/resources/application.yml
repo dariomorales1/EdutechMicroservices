@@ -16,15 +16,15 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: userservice
-          uri: http://localhost:8082
-          predicates:
-            - Path=/users/**
-
         - id: authservice
           uri: http://localhost:8081
           predicates:
             - Path=/auth/**
+
+        - id: userservice
+          uri: http://localhost:8082
+          predicates:
+            - Path=/users/**
 
         - id: courseservice
           uri: http://localhost:8083

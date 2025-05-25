@@ -1,0 +1,99 @@
+services:
+
+  apigateway:
+    container_name: apigateway
+    build:
+      context: .
+      dockerfile: apigateway/Dockerfile
+    ports:
+      - "8080:8080" # usualmente el gateway se expone en este puerto
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  authservice:
+    build:
+      context: .
+      dockerfile: authservice/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TNS_ADMIN=/app/Wallet_EduTechDB
+    volumes:
+      - ./authservice/Wallet_EduTechDB:/app/Wallet_EduTechDB
+
+  userservice:
+    build:
+      context: .
+      dockerfile: userservice/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TNS_ADMIN=/app/Wallet_EduTechDB
+    volumes:
+      - ./userservice/Wallet_EduTechDB:/app/Wallet_EduTechDB
+
+  courseservice:
+    build:
+      context: .
+      dockerfile: courseservice/Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TNS_ADMIN=/app/Wallet_EduTechDB
+    volumes:
+      - ./courseservice/Wallet_EduTechDB:/app/Wallet_EduTechDB
+
+  enrollmentservice:
+    build:
+      context: .
+      dockerfile: enrollmentservice/Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TNS_ADMIN=/app/Wallet_EduTechDB
+    volumes:
+      - ./enrollmentservice/Wallet_EduTechDB:/app/Wallet_EduTechDB
+
+  evaluationservice:
+    build:
+      context: .
+      dockerfile: evaluationservice/Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TNS_ADMIN=/app/Wallet_EduTechDB
+    volumes:
+      - ./evaluationservice/Wallet_EduTechDB:/app/Wallet_EduTechDB
+
+  billingservice:
+    build:
+      context: .
+      dockerfile: billingservice/Dockerfile
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TNS_ADMIN=/app/Wallet_EduTechDB
+    volumes:
+      - ./billingservice/Wallet_EduTechDB:/app/Wallet_EduTechDB
+
+  supportservice:
+    build:
+      context: .
+      dockerfile: supportservice/Dockerfile
+    ports:
+      - "8087:8087"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TNS_ADMIN=/app/Wallet_EduTechDB
+    volumes:
+      - ./supportservice/Wallet_EduTechDB:/app/Wallet_EduTechDB
+
+
+
+
