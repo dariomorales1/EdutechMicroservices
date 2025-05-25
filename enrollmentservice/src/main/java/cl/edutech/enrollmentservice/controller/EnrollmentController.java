@@ -31,7 +31,7 @@ public class EnrollmentController {
     public ResponseEntity<?> EnrollUserData(@PathVariable Integer idRequest) {
         try {
             Enrollment enroll = enrollmentService.findById(idRequest);
-            UserDTO userEnroll = enrollmentService.getUser(enroll.getStudentRut());
+            UserDTO userEnroll = enrollmentService.getUser(enroll.getUserRut());
             CourseDTO courseEnroll = enrollmentService.getCourse(enroll.getCourseId());
 
             // Aqui Creamos el EnrollmentUserCourseDTO
@@ -64,7 +64,7 @@ public class EnrollmentController {
     @PostMapping
     public ResponseEntity<?> createEnrollment(@RequestBody Enrollment enrollment) {
         Enrollment enrollExist = enrollmentService.findById(enrollment.getId());
-        UserDTO user = enrollmentService.getUser(enrollment.getStudentRut());
+        UserDTO user = enrollmentService.getUser(enrollment.getUserRut());
         CourseDTO course = enrollmentService.getCourse(enrollment.getCourseId());
         if (enrollExist != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("ENROLLMENT ALREADY EXISTS"));
@@ -90,7 +90,7 @@ public class EnrollmentController {
     @PutMapping("/{idRequest}")
     public ResponseEntity<MessageResponse> updateEnrollment(@PathVariable Integer idRequest, @RequestBody Enrollment enrollment) {
         Enrollment enrollExist = enrollmentService.findById(idRequest);
-        UserDTO user = enrollmentService.getUser(enrollment.getStudentRut());
+        UserDTO user = enrollmentService.getUser(enrollment.getUserRut());
         CourseDTO course = enrollmentService.getCourse(enrollment.getCourseId());
         if (enrollExist == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
