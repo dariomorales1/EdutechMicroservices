@@ -26,7 +26,7 @@ public class BillingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Billing>> getAllBillings() {
+    public ResponseEntity<List<Billing>> getAllBillings(Integer id) {
         List<Billing> billingList = billingService.findAll();
         if (billingList.isEmpty()) {
             return ResponseEntity.noContent().build();

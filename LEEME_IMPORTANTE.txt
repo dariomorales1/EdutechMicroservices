@@ -1,0 +1,9 @@
+Modos de ejecutar el programa:
+
+####DOCKER####
+1. cambiar los WebClientConfig > y dejar URL de Docker que aparece comentada y la local comentarla.
+2. cambiar el nombre en el apigateway en resources/application.yml_docker y dejar con nombre sin "_docker" y el otro dejarlo con nombre al final "_local"
+3. cambiar en application.properties de cada microservicio la ruta de la base de datos y dejar la de docker y comentar la local.
+
+#comando para levantar el docker en una terminal:
+docker-compose up --build

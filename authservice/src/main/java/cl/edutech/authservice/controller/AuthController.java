@@ -24,23 +24,33 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<MessageResponsive> login(@RequestBody LoginRequest loginRequest) {
-        UserDTO userExist = authService.getUser(loginRequest.getEmail());
-        UserDTO passExist = authService.getUser(loginRequest.getPassword());
-        if (userExist == null ){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponsive("Email not found"));
-        } else if (passExist == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponsive("Password not correct"));
-        } else if (userExist == passExist) {
-            String tokenId = authService.generateTokenId();
-            AuthUserDTO userDTO = new AuthUserDTO();
-            userDTO.setToken(tokenId);
-            userDTO.setEmail(userExist.getEmail());
-            userDTO.setPassword(userExist.getPassword());
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponsive("Login successful"));
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        UserDTO user = authService.getUser(loginRequest.getEmail());
+
+        if (user == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponsive("Email not found"));
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponsive("Login failed"));
+
+        if (!user.getPassword().equals(loginRequest.getPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponsive("Password not correct"));
+        }
+
+        String tokenId = authService.generateTokenId();
+
+        AuthUserDTO userDTO = new AuthUserDTO();
+        userDTO.setToken(tokenId);
+        userDTO.setEmail(user.getEmail());
+        userDTO.setPassword(user.getPassword());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userDTO);
     }
+
 
     @GetMapping("/ping-user")
     public ResponseEntity<?> pingUserService() {

@@ -27,28 +27,27 @@ public class EnrollmentController {
 
     // Consumo desde enrollment hacia course y user
 
-    @GetMapping("/EnrollUser/{idRequest}")
+    @GetMapping("/{idRequest}")
     public ResponseEntity<?> EnrollUserData(@PathVariable Integer idRequest) {
-        try {
-            Enrollment enroll = enrollmentService.findById(idRequest);
-            UserDTO userEnroll = enrollmentService.getUser(enroll.getUserRut());
-            CourseDTO courseEnroll = enrollmentService.getCourse(enroll.getCourseId());
-
-            // Aqui Creamos el EnrollmentUserCourseDTO
-            EnrollmentUserCourseDTO enrollUserCourse = new EnrollmentUserCourseDTO();
-
-            //Aqui les asignamos los datos obtenidos con los DTOs de enroll userEnroll y courseEnroll
-            enrollUserCourse.setId(enroll.getId());
-            enrollUserCourse.setRut(userEnroll.getRut());
-            enrollUserCourse.setEmail(userEnroll.getEmail());
-            enrollUserCourse.setPassword(userEnroll.getPassword());
-            enrollUserCourse.setCourseId(courseEnroll.getCourseId());
-            enrollUserCourse.setNameCourse(courseEnroll.getNameCourse());
-            return ResponseEntity.status(HttpStatus.OK).body(enrollUserCourse);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("User or Course not found!"));
+        Enrollment enrollExists = enrollmentService.findById(idRequest);
+        if (enrollExists == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
         }
+        UserDTO user = enrollmentService.getUser(enrollExists.getUserRut());
+        CourseDTO course = enrollmentService.getCourse(enrollExists.getCourseId());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
+        } else if (course == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
+        }
+        EnrollmentUserCourseDTO enrollmentUserCourseDTO = new EnrollmentUserCourseDTO();
+        enrollmentUserCourseDTO.setId(enrollExists.getId());
+        enrollmentUserCourseDTO.setRut(user.getRut());
+        enrollmentUserCourseDTO.setEmail(user.getEmail());
+        enrollmentUserCourseDTO.setPassword(user.getPassword());
+        enrollmentUserCourseDTO.setCourseId(course.getCourseId());
+        enrollmentUserCourseDTO.setNameCourse(course.getNameCourse());
+        return ResponseEntity.ok(enrollmentUserCourseDTO);
 
     }
 

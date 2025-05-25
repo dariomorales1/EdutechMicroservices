@@ -10,7 +10,8 @@ public class WebClientConfig {
     @Bean
     public WebClient userWebClient() {
         return WebClient.builder()
-                .baseUrl("http://apigateway:8080/users")
+                //.baseUrl("http://apigateway:8080/users")  //#<<<<<<<-------DOCKER
+                .baseUrl("http://localhost:8080/users")    //#<<<<<<<-------LOCAL
                 //.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) <- Actualizar cn los datos de api key
                 .build();
     }
@@ -18,7 +19,8 @@ public class WebClientConfig {
     @Bean
     public WebClient courseWebClient() {
         return WebClient.builder()
-                .baseUrl("http://apigateway:8080/courses")
+                //.baseUrl("http://apigateway:8080/courses")  //#<<<<<<<-------DOCKER
+                .baseUrl("http://localhost:8080/courses")    //#<<<<<<<-------LOCAL
                 //.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) <- Actualizar cn los datos de api key
                 .build();
     }
@@ -26,7 +28,8 @@ public class WebClientConfig {
     @Bean
     public WebClient enrollmentWebClient() {
         return WebClient.builder()
-                .baseUrl("http://apigateway:8080/enrollments")
+                //.baseUrl("http://apigateway:8080/enroll") //#<<<<<<<-------DOCKER
+                .baseUrl("http://localhost:8080/enroll")   //#<<<<<<<-------LOCAL
                 //.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) <- Actualizar cn los datos de api key
                 .build();
     }
