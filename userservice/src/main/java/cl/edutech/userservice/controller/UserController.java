@@ -74,8 +74,6 @@ public class UserController {
                 userService.remove(rutRequest);
                 userService.create(userRequest);
                 return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("USER WAS UPDATED"));
-            } else {
-                break;
             }
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
