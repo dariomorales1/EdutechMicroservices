@@ -38,6 +38,8 @@ public class AuthController {
         }
 
         // 2. Validar contraseña usando el hash recibido de UserService
+        System.out.println("Password recibido del usuario: " + loginRequest.getPassword());
+        System.out.println("Hash recibido desde UserService: " + user.getPassword());
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
