@@ -1,15 +1,13 @@
 package cl.edutech.authservice.controller;
 
-import cl.edutech.authservice.DTO.AuthUserDTO;
-import cl.edutech.authservice.DTO.LoginRequest;
-import cl.edutech.authservice.DTO.UserDTO;
-import cl.edutech.authservice.controller.Responsive.MessageResponsive;
-import cl.edutech.authservice.model.Token;
+import cl.edutech.authservice.dto.AuthUserDTO;
+import cl.edutech.authservice.dto.LoginRequest;
+import cl.edutech.authservice.dto.UserDTO;
 import cl.edutech.authservice.service.AuthService;
 import cl.edutech.authservice.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,50 +26,44 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Autowired
-    private AuthService authService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @GetMapping("/ping")
-    public ResponseEntity<MessageResponsive> ping() {
-        return ResponseEntity.ok(new MessageResponsive("pong"));
-    }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        // 1. Obtener el usuario desde el servicio (UserDTO debe traer al menos email + hash de contraseña)
+        // 1. Llamar a UserService para obtener datos del usuario
         UserDTO user = authService.getUser(loginRequest.getEmail());
 
         if (user == null) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponsive("Email not found"));
+                    .body("Email not found");
         }
 
-        // 2. Comparar la contraseña ingresada (texto plano) con el hash almacenado
+        // 2. Validar contraseña usando el hash recibido de UserService
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponsive("Password not correct"));
+                    .body("Password not correct");
         }
 
-        // 3. Generar el JWT (ahora que la contraseña es válida)
-        String tokenId = jwtUtil.generateToken(user.getEmail());
+        // 3. Generar el JWT
+        String token = jwtUtil.generateToken(user.getEmail());
 
-        AuthUserDTO userDTO = new AuthUserDTO();
-        userDTO.setToken(tokenId);
-        userDTO.setEmail(user.getEmail());
+        AuthUserDTO authUser = new AuthUserDTO();
+        authUser.setEmail(user.getEmail());
+        authUser.setToken(token);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(userDTO);
+        return ResponseEntity.ok(authUser);
     }
 
+    // Ping para verificar AuthService
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
+    }
+
+    // Ping para probar conexión con UserService
     @GetMapping("/ping-user")
-    public ResponseEntity<?> pingUserService() {
-        ResponseEntity<String> response = authService.pingUserService();
-        return ResponseEntity.ok(response.getBody());
+    public ResponseEntity<String> pingUserService() {
+        String body = authService.pingUserService().getBody();
+        return ResponseEntity.ok(body);
     }
 }

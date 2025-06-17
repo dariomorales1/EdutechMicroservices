@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "support_tickets")
+@Table(name = "supports")
 public class SupportTicket {
 
     @Id
