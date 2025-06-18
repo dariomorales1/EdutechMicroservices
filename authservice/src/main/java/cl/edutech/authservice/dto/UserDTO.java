@@ -2,10 +2,9 @@ package cl.edutech.authservice.dto;
 
 public class UserDTO {
     private String email;
-    private String password; // Este es el hash bcrypt que viene de UserService
-    private String role;     // Opcional, según tu modelo
+    private String password;
+    private String role;
 
-    // Constructores
     public UserDTO() { }
     public UserDTO(String email, String password, String role) {
         this.email = email;
@@ -13,7 +12,6 @@ public class UserDTO {
         this.role = role;
     }
 
-    // Getters y setters
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 

@@ -2,27 +2,27 @@ package cl.edutech.authservice.util;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
+
     // Usa una clave secreta más robusta (¡mínimo 32 caracteres para HS256!)
     private static final String SECRET = "edutech-2024-backend-sistema-secreto-jwt-123";
-    private static final long EXPIRATION_TIME = 86400000; // 1 día (en milisegundos)
+    private static final long EXPIRATION_TIME = 86400000; // 1 día (milisegundos)
 
-    // Generar token
-    public String generateToken(String email) {
+
+    public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, SECRET)
                 .compact();
     }
 
-    // Extraer email del token
     public String extractEmail(String token) {
         return Jwts.parser()
                 .setSigningKey(SECRET)
@@ -31,7 +31,6 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // Validar token
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
@@ -41,7 +40,6 @@ public class JwtUtil {
         }
     }
 
-    // Chequear expiración del token (útil si quieres agregar lógica personalizada)
     public boolean isTokenExpired(String token) {
         Date expiration = Jwts.parser()
                 .setSigningKey(SECRET)
@@ -50,4 +48,5 @@ public class JwtUtil {
                 .getExpiration();
         return expiration.before(new Date());
     }
+
 }

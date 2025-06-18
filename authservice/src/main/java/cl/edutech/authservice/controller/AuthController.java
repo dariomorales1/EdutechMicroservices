@@ -28,7 +28,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        // 1. Llamar a UserService para obtener datos del usuario
+
         UserDTO user = authService.getUser(loginRequest.getEmail());
 
         if (user == null) {
@@ -37,17 +37,13 @@ public class AuthController {
                     .body("Email not found");
         }
 
-        // 2. Validar contraseña usando el hash recibido de UserService
-        System.out.println("Password recibido del usuario: " + loginRequest.getPassword());
-        System.out.println("Hash recibido desde UserService: " + user.getPassword());
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body("Password not correct");
         }
 
-        // 3. Generar el JWT
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
         AuthUserDTO authUser = new AuthUserDTO();
         authUser.setEmail(user.getEmail());
@@ -56,13 +52,11 @@ public class AuthController {
         return ResponseEntity.ok(authUser);
     }
 
-    // Ping para verificar AuthService
     @GetMapping("/ping")
     public ResponseEntity<String> ping() {
         return ResponseEntity.ok("pong");
     }
 
-    // Ping para probar conexión con UserService
     @GetMapping("/ping-user")
     public ResponseEntity<String> pingUserService() {
         String body = authService.pingUserService().getBody();

@@ -24,5 +24,4 @@ public class Token {
     @Column
     private String password;
 
-
 }
