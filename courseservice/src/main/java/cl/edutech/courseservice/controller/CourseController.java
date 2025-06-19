@@ -12,14 +12,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/courses")
-
 public class CourseController {
 
     @Autowired
     private CourseService courseService;
 
     @GetMapping("/ping")
-    public ResponseEntity<MessageResponse> ping() { return ResponseEntity.ok(new MessageResponse("PONG"));
+    public ResponseEntity<MessageResponse> ping() {
+        return ResponseEntity.ok(new MessageResponse("PONG"));
     }
 
     @GetMapping
@@ -33,47 +33,40 @@ public class CourseController {
 
     @GetMapping("/{courseId}")
     public ResponseEntity<Course> searchCourse(@PathVariable String courseId) {
-        try {
-            Course course = courseService.findById(courseId);
-            return ResponseEntity.ok(course);
-        } catch (Exception e) {
+        Course course = courseService.findById(courseId);
+        if (course == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+        return ResponseEntity.ok(course);
     }
 
     @PostMapping
     public ResponseEntity<MessageResponse> createCourse(@RequestBody Course course) {
-        List<Course> courseList = courseService.findAll();
-        for (Course existingCourse : courseList) {
-            if(course.getCourseId().equals(existingCourse.getCourseId())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("COURSE ALREADY EXISTS"));
-            }
+        if (courseService.existsByCourseId(course.getCourseId())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new MessageResponse("COURSE ALREADY EXISTS"));
         }
         courseService.create(course);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("COURSE CREATED"));
-
     }
 
     @PutMapping("/{courseId}")
     public ResponseEntity<MessageResponse> updateCourse(@PathVariable String courseId, @RequestBody Course courseRequest) {
-        List<Course> courseList = courseService.findAll();
-        for (Course course : courseList){
-            if(course.getCourseId().equals(courseId)){
-                courseService.remove(courseId);
-                courseService.create(courseRequest);
-                return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("COURSE UPDATED"));
-            }
-        } return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
+        if (!courseService.existsByCourseId(courseId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("COURSE NOT FOUND"));
+        }
+        courseService.update(courseId, courseRequest);
+        return ResponseEntity.ok(new MessageResponse("COURSE UPDATED"));
     }
 
     @DeleteMapping("/{courseId}")
     public ResponseEntity<MessageResponse> deleteCourse(@PathVariable String courseId) {
-        List<Course> courseList = courseService.findAll();
-        for (Course course : courseList){
-            if(course.getCourseId().equals(courseId)){
-                courseService.remove(courseId);
-                return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("COURSE DELETED"));
-            }
-        }return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
+        if (!courseService.existsByCourseId(courseId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("COURSE NOT FOUND"));
+        }
+        courseService.remove(courseId);
+        return ResponseEntity.ok(new MessageResponse("COURSE DELETED"));
     }
 }
