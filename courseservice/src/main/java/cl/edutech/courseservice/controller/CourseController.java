@@ -69,4 +69,12 @@ public class CourseController {
         courseService.remove(courseId);
         return ResponseEntity.ok(new MessageResponse("COURSE DELETED"));
     }
+
+    @PatchMapping("/{courseId}")
+    public ResponseEntity<MessageResponse> patchCourse(
+            @PathVariable String courseId,
+            @RequestBody Course courseRequest) {
+        courseService.partialUpdate(courseId, courseRequest);
+        return ResponseEntity.ok(new MessageResponse("COURSE PARTIALLY UPDATED"));
+    }
 }

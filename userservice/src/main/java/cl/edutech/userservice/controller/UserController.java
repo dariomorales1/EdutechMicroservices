@@ -110,4 +110,12 @@ public class UserController {
                     .body(new MessageResponse("USER NOT FOUND"));
         }
     }
+
+    @PatchMapping("/{rut}")
+    public ResponseEntity<MessageResponse> patchUser(
+            @PathVariable String rut,
+            @RequestBody User userRequest) {
+        userService.partialUpdate(rut, userRequest);
+        return ResponseEntity.ok(new MessageResponse("USER PARTIALLY UPDATED"));
+    }
 }
