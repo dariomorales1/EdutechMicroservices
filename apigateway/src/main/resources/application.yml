@@ -50,3 +50,17 @@ spring:
           uri: http://localhost:8087
           predicates:
             - Path=/support/**
+      globalcors:
+        corsConfigurations:
+          '[/**]': # Aplica a todas las rutas
+            allowedOrigins:
+              - 'http://localhost:5173'  # Permitir solicitudes solo desde localhost:5173 (tu frontend)
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders:
+              - '*'
+            allowCredentials: true
+            maxAge: 3600
