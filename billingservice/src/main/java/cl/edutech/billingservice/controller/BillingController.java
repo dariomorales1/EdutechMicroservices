@@ -108,4 +108,10 @@ public class BillingController {
         return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("BILLING DELETED"));
 
     }
+
+    @PatchMapping("/{billingId}")
+    public ResponseEntity<MessageResponse> patchBilling(@PathVariable Integer billingId, @RequestBody Billing billingRequest) {
+        billingService.partialUpdate(billingId, billingRequest);
+        return ResponseEntity.ok(new MessageResponse("BILLING PARTIALLY UPDATED"));
+    }
 }
