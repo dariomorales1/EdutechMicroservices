@@ -14,10 +14,5 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 COPY --from=builder /app/apigateway/target/*.jar app.jar
-COPY --from=builder /app/apigateway/Wallet_EduTechDB /app/Wallet_EduTechDB
-
-RUN chmod -R 755 /app/Wallet_EduTechDB
-
-ENV TNS_ADMIN=/app/Wallet_EduTechDB
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

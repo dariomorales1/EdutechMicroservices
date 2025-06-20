@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import cl.edutech.userservice.dto.PasswordChangeRequest;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -26,41 +28,52 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> userList = userService.findAll();
-        if (userList.isEmpty()) {
+
+        List<User> usersWithoutPassword = userList.stream()
+                .map(u -> {
+                    u.setPassword(null);
+                    return u;
+                })
+                .collect(Collectors.toList());
+
+        if (usersWithoutPassword.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(userList);
+        return ResponseEntity.ok(usersWithoutPassword);
     }
 
     @GetMapping("/{rutRequest}")
     public ResponseEntity<User> searchUser(@PathVariable String rutRequest) {
         try {
             User user = userService.findByRut(rutRequest);
-            return ResponseEntity.ok(user);
+            if(user != null) user.setPassword(null);
+            return user != null ?
+                    ResponseEntity.ok(user) :
+                    ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-
     }
 
     @GetMapping("/email/{emailRequest}")
     public ResponseEntity<User> searchUserByEmail(@PathVariable String emailRequest) {
         try {
             User user = userService.findByEmail(emailRequest);
-            return ResponseEntity.ok(user);
+            return user != null ?
+                    ResponseEntity.ok(user) :
+                    ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-
     }
 
     @PostMapping
     public ResponseEntity<MessageResponse> createUser(@RequestBody User userRequest) {
-        List<User> userList = userService.findAll();
-        for(User user : userList) {
-            if(user.getRut().equals(userRequest.getRut())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("USER WAS EXISTS"));
-            }
+        if (userService.existsByRut(userRequest.getRut())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("USER ALREADY EXISTS"));
+        }
+        if (userService.existsByEmail(userRequest.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("EMAIL ALREADY EXISTS"));
         }
         userService.create(userRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("USER CREATED"));
@@ -68,51 +81,41 @@ public class UserController {
 
     @PutMapping("/{rutRequest}")
     public ResponseEntity<MessageResponse> updateUser(@PathVariable String rutRequest, @RequestBody User userRequest) {
-        List<User> userList = userService.findAll();
-        for(User user : userList) {
-            if(user.getRut().equals(rutRequest)) {
-                userService.remove(rutRequest);
-                userService.create(userRequest);
-                return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("USER WAS UPDATED"));
-            }
+        if (!userService.existsByRut(rutRequest)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
+        userService.update(rutRequest, userRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("USER UPDATED"));
     }
 
-
-   @DeleteMapping("/{rutRequest}")
+    @DeleteMapping("/{rutRequest}")
     public ResponseEntity<MessageResponse> deleteUser(@PathVariable String rutRequest) {
-        List<User> userList = userService.findAll();
-        for(User user : userList) {
-            if(user.getRut().equals(rutRequest)) {
-                userService.remove(rutRequest);
-                return ResponseEntity.ok(new MessageResponse("User deleted"));
-            }
+        if (!userService.existsByRut(rutRequest)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER DOES NOT EXIST"));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("User Does Not Exist"));
+        userService.remove(rutRequest);
+        return ResponseEntity.ok(new MessageResponse("USER DELETED"));
     }
 
-    // Metodo para validar tokens
+    @PutMapping("/{rut}/password")
+    public ResponseEntity<MessageResponse> updatePassword(
+            @PathVariable String rut,
+            @RequestBody PasswordChangeRequest passwordChangeRequest) {
 
-    @PostMapping("/validate")
-    public ResponseEntity<Boolean> validateUser(@RequestParam String emailRequest, @RequestParam String passwordRequest) {
-       List<User> userList = userService.findAll();
-       for(User user : userList) {
-           if(user.getEmail().equals(emailRequest) && user.getPassword().equals(passwordRequest)) {
-               return ResponseEntity.ok(true);
-           }
-       }
-       return ResponseEntity.ok(false);
+        try {
+            userService.updatePassword(rut, passwordChangeRequest.getNewPassword());
+            return ResponseEntity.ok(new MessageResponse("PASSWORD UPDATED"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse("USER NOT FOUND"));
+        }
     }
 
-    @PostMapping("/validate/rut")
-    public ResponseEntity<Boolean> validateUserRut(@RequestParam String rutRequest) {
-        List<User> userList = userService.findAll();
-        for(User user : userList) {
-            if(user.getRut().equals(rutRequest)) {
-                return ResponseEntity.ok(true);
-            }
-        }
-        return ResponseEntity.ok(false);
+    @PatchMapping("/{rut}")
+    public ResponseEntity<MessageResponse> patchUser(
+            @PathVariable String rut,
+            @RequestBody User userRequest) {
+        userService.partialUpdate(rut, userRequest);
+        return ResponseEntity.ok(new MessageResponse("USER PARTIALLY UPDATED"));
     }
 }

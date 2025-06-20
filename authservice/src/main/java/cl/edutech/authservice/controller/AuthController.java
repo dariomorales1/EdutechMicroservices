@@ -1,60 +1,65 @@
 package cl.edutech.authservice.controller;
 
-import cl.edutech.authservice.DTO.AuthUserDTO;
-import cl.edutech.authservice.DTO.LoginRequest;
-import cl.edutech.authservice.DTO.UserDTO;
-import cl.edutech.authservice.controller.Responsive.MessageResponsive;
-import cl.edutech.authservice.model.Token;
+import cl.edutech.authservice.dto.AuthUserDTO;
+import cl.edutech.authservice.dto.LoginRequest;
+import cl.edutech.authservice.dto.UserDTO;
 import cl.edutech.authservice.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cl.edutech.authservice.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+    private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
-    @GetMapping("/ping")
-    public ResponseEntity<MessageResponsive> ping() {
-        return ResponseEntity.ok(new MessageResponsive("pong"));
+    public AuthController(AuthService authService,
+                          JwtUtil jwtUtil,
+                          PasswordEncoder passwordEncoder) {
+        this.authService = authService;
+        this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+
         UserDTO user = authService.getUser(loginRequest.getEmail());
 
         if (user == null) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponsive("Email not found"));
+                    .body("Email not found");
         }
 
-        if (!user.getPassword().equals(loginRequest.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponsive("Password not correct"));
+                    .body("Password not correct");
         }
 
-        String tokenId = authService.generateTokenId();
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
-        AuthUserDTO userDTO = new AuthUserDTO();
-        userDTO.setToken(tokenId);
-        userDTO.setEmail(user.getEmail());
-        userDTO.setPassword(user.getPassword());
+        AuthUserDTO authUser = new AuthUserDTO();
+        authUser.setEmail(user.getEmail());
+        authUser.setToken(token);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(userDTO);
+        return ResponseEntity.ok(authUser);
     }
 
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
+    }
 
     @GetMapping("/ping-user")
-    public ResponseEntity<?> pingUserService() {
-        ResponseEntity<String> response = authService.pingUserService();
-        return ResponseEntity.ok(response.getBody());
+    public ResponseEntity<String> pingUserService() {
+        String body = authService.pingUserService().getBody();
+        return ResponseEntity.ok(body);
     }
 }

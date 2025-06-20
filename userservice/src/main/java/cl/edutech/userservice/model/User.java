@@ -17,15 +17,18 @@ public class User {
     @Id
     private String rut;
 
-    @Column
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column
+    @Column(nullable = false)
     private String firstName;
 
-    @Column
+    @Column(nullable = false)
     private String lastName;
 
-    @Column
+    @Column(nullable = false)
     private String password;
+
+    @Column
+    private String role;
 }

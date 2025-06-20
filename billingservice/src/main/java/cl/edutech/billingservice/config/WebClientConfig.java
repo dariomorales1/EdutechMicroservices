@@ -12,7 +12,6 @@ public class WebClientConfig {
         return WebClient.builder()
                 //.baseUrl("http://apigateway:8080/users")  //#<<<<<<<-------DOCKER
                 .baseUrl("http://localhost:8080/users")    //#<<<<<<<-------LOCAL
-                //.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) <- Actualizar cn los datos de api key
                 .build();
     }
 
@@ -21,7 +20,6 @@ public class WebClientConfig {
         return WebClient.builder()
                 //.baseUrl("http://apigateway:8080/courses")  //#<<<<<<<-------DOCKER
                 .baseUrl("http://localhost:8080/courses")    //#<<<<<<<-------LOCAL
-                //.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) <- Actualizar cn los datos de api key
                 .build();
     }
 
@@ -30,7 +28,6 @@ public class WebClientConfig {
         return WebClient.builder()
                 //.baseUrl("http://apigateway:8080/enroll") //#<<<<<<<-------DOCKER
                 .baseUrl("http://localhost:8080/enroll")   //#<<<<<<<-------LOCAL
-                //.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) <- Actualizar cn los datos de api key
                 .build();
     }
 }

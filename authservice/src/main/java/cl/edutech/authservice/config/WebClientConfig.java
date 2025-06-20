@@ -10,11 +10,8 @@ public class WebClientConfig {
     public WebClient userWebClient() {
         return WebClient.builder()
 
-                //###DOCKER###
+                //###DOCKER - LOCAL###
                 //.baseUrl("http://apigateway:8080/users")
-                //.build();
-
-                //###LOCAL###
                 .baseUrl("http://localhost:8080/users")
                 .build();
     }
