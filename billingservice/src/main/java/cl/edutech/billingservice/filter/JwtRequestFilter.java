@@ -63,4 +63,3 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         return !path.equals("/billings/ping");
     }
 }
-

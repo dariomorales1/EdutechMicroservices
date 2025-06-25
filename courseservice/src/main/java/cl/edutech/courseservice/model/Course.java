@@ -22,7 +22,13 @@ public class Course {
     private String nameCourse;
 
     @Column
+    private String title;
+
+    @Column
     private String description;
+
+    @Column
+    private String imageName;
 
     @Column
     private Integer price;
