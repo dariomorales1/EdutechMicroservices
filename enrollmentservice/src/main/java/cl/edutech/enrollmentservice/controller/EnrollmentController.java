@@ -1,8 +1,6 @@
 package cl.edutech.enrollmentservice.controller;
 
-import cl.edutech.enrollmentservice.DTO.CourseDTO;
 import cl.edutech.enrollmentservice.DTO.EnrollmentUserCourseDTO;
-import cl.edutech.enrollmentservice.DTO.UserDTO;
 import cl.edutech.enrollmentservice.controller.response.MessageResponse;
 import cl.edutech.enrollmentservice.model.Enrollment;
 import cl.edutech.enrollmentservice.service.EnrollmentService;
@@ -25,34 +23,14 @@ public class EnrollmentController {
         return "pong";
     }
 
-    // Consumo desde enrollment hacia course y user
-
     @GetMapping("/{idRequest}")
-    public ResponseEntity<?> EnrollUserData(@PathVariable Integer idRequest) {
-        Enrollment enrollExists = enrollmentService.findById(idRequest);
-        if (enrollExists == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
-        }
-        UserDTO user = enrollmentService.getUser(enrollExists.getUserRut());
-        CourseDTO course = enrollmentService.getCourse(enrollExists.getCourseId());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
-        } else if (course == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
-        }
-        EnrollmentUserCourseDTO enrollmentUserCourseDTO = new EnrollmentUserCourseDTO();
-        enrollmentUserCourseDTO.setId(enrollExists.getId());
-        enrollmentUserCourseDTO.setRut(user.getRut());
-        enrollmentUserCourseDTO.setEmail(user.getEmail());
-        enrollmentUserCourseDTO.setPassword(user.getPassword());
-        enrollmentUserCourseDTO.setCourseId(course.getCourseId());
-        enrollmentUserCourseDTO.setNameCourse(course.getNameCourse());
-        return ResponseEntity.ok(enrollmentUserCourseDTO);
-
+    public ResponseEntity<EnrollmentUserCourseDTO> EnrollUserData(@PathVariable Integer idRequest) {
+        EnrollmentUserCourseDTO dto = enrollmentService.getEnrollmentWithUserAndCourse(idRequest);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping
-    public ResponseEntity<List<Enrollment>> getAllEnrollments(Integer id) {
+    public ResponseEntity<List<Enrollment>> getAllEnrollments() {
         List<Enrollment> enrollmentList = enrollmentService.findAll();
         if (enrollmentList.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -61,61 +39,34 @@ public class EnrollmentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createEnrollment(@RequestBody Enrollment enrollment) {
-        Enrollment enrollExist = enrollmentService.findById(enrollment.getId());
-        UserDTO user = enrollmentService.getUser(enrollment.getUserRut());
-        CourseDTO course = enrollmentService.getCourse(enrollment.getCourseId());
-        if (enrollExist != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("ENROLLMENT ALREADY EXISTS"));
-        } else if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
-        } else if (course == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
-        }
+    public ResponseEntity<MessageResponse> createEnrollment(@RequestBody Enrollment enrollment) {
         enrollmentService.create(enrollment);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("ENROLLMENT CREATED"));
     }
 
-    @GetMapping("/ping-user")
-    public ResponseEntity<MessageResponse> pingUserService() {
-        ResponseEntity<String> userResponse = enrollmentService.pingUserService();
-        if (userResponse.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.ok(new MessageResponse("PONG"));
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("USER SERVICE NOT AVAILABLE"));
-        }
-    }
-
     @PutMapping("/{idRequest}")
     public ResponseEntity<MessageResponse> updateEnrollment(@PathVariable Integer idRequest, @RequestBody Enrollment enrollment) {
-        Enrollment enrollExist = enrollmentService.findById(idRequest);
-        UserDTO user = enrollmentService.getUser(enrollment.getUserRut());
-        CourseDTO course = enrollmentService.getCourse(enrollment.getCourseId());
-        if (enrollExist == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
-        } else if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
-        } else if (course == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
-        } else {
-            enrollmentService.remove(idRequest);
-            enrollmentService.create(enrollment);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("ENROLLMENT UPDATED"));
-        }
+        enrollmentService.update(idRequest, enrollment);
+        return ResponseEntity.ok(new MessageResponse("ENROLLMENT UPDATED"));
+    }
+
+    @PatchMapping("/{idRequest}")
+    public ResponseEntity<MessageResponse> patchEnrollment(@PathVariable Integer idRequest, @RequestBody Enrollment enrollment) {
+        enrollmentService.partialUpdate(idRequest, enrollment);
+        return ResponseEntity.ok(new MessageResponse("ENROLLMENT PARTIALLY UPDATED"));
     }
 
     @DeleteMapping("/{idRequest}")
     public ResponseEntity<MessageResponse> deleteEnrollment(@PathVariable Integer idRequest) {
-        Enrollment enrollExist = enrollmentService.findById(idRequest);
-        if (enrollExist == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
-        } else {
-            enrollmentService.remove(idRequest);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("ENROLLMENT DELETED"));
-        }
+        enrollmentService.remove(idRequest);
+        return ResponseEntity.ok(new MessageResponse("ENROLLMENT DELETED"));
+    }
+
+    @GetMapping("/ping-user")
+    public ResponseEntity<MessageResponse> pingUserService() {
+        boolean ok = enrollmentService.pingUserService();
+        return ok
+                ? ResponseEntity.ok(new MessageResponse("PONG"))
+                : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("USER SERVICE NOT AVAILABLE"));
     }
 }
-
-
-
-

@@ -1,29 +1,19 @@
 package cl.edutech.enrollmentservice.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
-@Getter
-@Setter
+@Entity
+@Table(name = "enrollments")
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Table(name = "ENROLLMENT")
-@Entity
+@Getter
+@Setter
 public class Enrollment {
-
     @Id
     private Integer id;
-
-    @Column
+    @Column(nullable = false)
     private String userRut;
-
-    @Column
+    @Column(nullable = false)
     private String courseId;
-
-    @Column
-    private String message;
 }
