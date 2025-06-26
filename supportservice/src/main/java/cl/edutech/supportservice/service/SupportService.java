@@ -1,63 +1,24 @@
 package cl.edutech.supportservice.service;
 
-import cl.edutech.supportservice.DTO.CourseDTO;
-import cl.edutech.supportservice.DTO.UserDTO;
 import cl.edutech.supportservice.model.SupportTicket;
 import cl.edutech.supportservice.repository.SupportRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import cl.edutech.supportservice.DTO.UserDTO;
+import cl.edutech.supportservice.DTO.CourseDTO;
+import cl.edutech.supportservice.exception.ConflictException;
+import cl.edutech.supportservice.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 @Service
-@Transactional
+@RequiredArgsConstructor
 public class SupportService {
 
+    private final SupportRepository supportRepository;
     private final WebClient userWebClient;
     private final WebClient courseWebClient;
-
-    public SupportService(WebClient userWebClient, WebClient courseWebClient) {
-        this.userWebClient = userWebClient;
-        this.courseWebClient = courseWebClient;
-    }
-
-    public UserDTO getUser(String rutRequest) {
-        return userWebClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/{rutRequest}").build(rutRequest))
-                .retrieve()
-                .onStatus(
-                        HttpStatusCode::is4xxClientError,
-                        clientResponse -> clientResponse.bodyToMono(String.class).then(Mono.empty())
-                )
-                .bodyToMono(UserDTO.class)
-                .onErrorResume(e -> Mono.empty())
-                .block();
-    }
-
-    public CourseDTO getCourse(String courseIdRequest) {
-        return courseWebClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/{courseIdRequest}").build(courseIdRequest))
-                .retrieve()
-                .onStatus(
-                        HttpStatusCode::is4xxClientError,
-                        clientResponse -> clientResponse.bodyToMono(String.class).then(Mono.empty())
-                )
-                .bodyToMono(CourseDTO.class)
-                .onErrorResume(e -> Mono.empty())
-                .block();
-    }
-
-
-    @Autowired
-    private SupportRepository supportRepository;
-
-
 
     public List<SupportTicket> findAll() {
         return supportRepository.findAll();
@@ -67,11 +28,92 @@ public class SupportService {
         return supportRepository.findById(id).orElse(null);
     }
 
-    public SupportTicket create(SupportTicket supportTicket) {
-        return supportRepository.save(supportTicket);
+    public SupportTicket create(SupportTicket ticket) {
+        if (supportRepository.existsById(ticket.getId())) {
+            throw new ConflictException("Ticket already exists");
+        }
+        if (getUser(ticket.getUserRut()) == null) {
+            throw new NotFoundException("User not found");
+        }
+        if (getCourse(ticket.getCourseId()) == null) {
+            throw new NotFoundException("Course not found");
+        }
+        return supportRepository.save(ticket);
     }
 
     public void remove(Integer id) {
+        if (!supportRepository.existsById(id)) {
+            throw new NotFoundException("Ticket not found");
+        }
         supportRepository.deleteById(id);
+    }
+
+    public void update(Integer id, SupportTicket ticketRequest) {
+        SupportTicket existing = findById(id);
+        if (existing == null) throw new NotFoundException("Ticket not found");
+
+        if (getUser(ticketRequest.getUserRut()) == null) {
+            throw new NotFoundException("User not found");
+        }
+        if (getCourse(ticketRequest.getCourseId()) == null) {
+            throw new NotFoundException("Course not found");
+        }
+
+        existing.setUserRut(ticketRequest.getUserRut());
+        existing.setCourseId(ticketRequest.getCourseId());
+        existing.setSubject(ticketRequest.getSubject());
+        existing.setDescription(ticketRequest.getDescription());
+
+        supportRepository.save(existing);
+    }
+
+    public void partialUpdate(Integer id, SupportTicket ticketRequest) {
+        SupportTicket existing = findById(id);
+        if (existing == null) throw new NotFoundException("Ticket not found");
+
+        if (ticketRequest.getUserRut() != null) {
+            if (getUser(ticketRequest.getUserRut()) == null) {
+                throw new NotFoundException("User not found");
+            }
+            existing.setUserRut(ticketRequest.getUserRut());
+        }
+        if (ticketRequest.getCourseId() != null) {
+            if (getCourse(ticketRequest.getCourseId()) == null) {
+                throw new NotFoundException("Course not found");
+            }
+            existing.setCourseId(ticketRequest.getCourseId());
+        }
+        if (ticketRequest.getSubject() != null) {
+            existing.setSubject(ticketRequest.getSubject());
+        }
+        if (ticketRequest.getDescription() != null) {
+            existing.setDescription(ticketRequest.getDescription());
+        }
+
+        supportRepository.save(existing);
+    }
+
+    public UserDTO getUser(String userRut) {
+        try {
+            return userWebClient.get()
+                    .uri("/{rut}", userRut)
+                    .retrieve()
+                    .bodyToMono(UserDTO.class)
+                    .block();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public CourseDTO getCourse(String courseId) {
+        try {
+            return courseWebClient.get()
+                    .uri("/{courseId}", courseId)
+                    .retrieve()
+                    .bodyToMono(CourseDTO.class)
+                    .block();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

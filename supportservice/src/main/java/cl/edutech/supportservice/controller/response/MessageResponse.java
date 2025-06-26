@@ -1,12 +1,10 @@
 package cl.edutech.supportservice.controller.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class MessageResponse {
     private String message;
 }
