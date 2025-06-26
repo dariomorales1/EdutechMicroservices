@@ -24,4 +24,3 @@ public class GlobalExceptionHandler {
                 .body("Internal error: " + ex.getMessage());
     }
 }
-

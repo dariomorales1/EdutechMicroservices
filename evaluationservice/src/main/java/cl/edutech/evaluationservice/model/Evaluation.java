@@ -1,10 +1,7 @@
 package cl.edutech.evaluationservice.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "evaluations")
@@ -12,21 +9,19 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-
 public class Evaluation {
     @Id
     private String evaluationId;
 
-    @Column
+    @Column(nullable = false)
     private String evaluationName;
 
-    @Column
-    private String StudentId;
-
-    @Column
-    private String courseId;
-
-    @Column
+    @Column(nullable = false)
     private Double score;
 
+    @Column(nullable = false)
+    private String studentId;
+
+    @Column(nullable = false)
+    private String courseId;
 }

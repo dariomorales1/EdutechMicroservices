@@ -27,4 +27,7 @@ public class Billing {
     @Column
     private Integer enrollmentId;
 
+    @Column
+    private Integer amount;
+
 }

@@ -9,15 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/support")
 public class SupportController {
-
 
     @Autowired
     private SupportService supportService;
@@ -54,45 +51,24 @@ public class SupportController {
 
     @PostMapping
     public ResponseEntity<?> createSupportTicket(@RequestBody SupportTicket ticket) {
-        SupportTicket ticketExist = supportService.findById(ticket.getId());
-        UserDTO user = supportService.getUser(ticket.getUserRut());
-        CourseDTO course = supportService.getCourse(ticket.getCourseId());
-        if (ticketExist != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("Ticket already exists"));
-        } else if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("User not found"));
-        } else if (course == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Course not found"));
-        }
         supportService.create(ticket);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Ticket created"));
     }
 
-    // -> Aqui voy
-
     @PutMapping("/{idRequest}")
     public ResponseEntity<MessageResponse> updateSupportTicket(@PathVariable Integer idRequest, @RequestBody SupportTicket ticketRequest) {
-        SupportTicket ticketExist = supportService.findById(idRequest);
-        UserDTO user = supportService.getUser(ticketRequest.getUserRut());
-        CourseDTO course = supportService.getCourse(ticketRequest.getCourseId());
-        if (ticketExist == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new MessageResponse("Ticket not found"));
-        } else if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("User not found"));
-        } else if (course == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Course not found"));
-        }
-        supportService.remove(idRequest);
-        supportService.create(ticketRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Ticket updated"));
+        supportService.update(idRequest, ticketRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Ticket updated"));
+    }
+
+    @PatchMapping("/{idRequest}")
+    public ResponseEntity<MessageResponse> patchSupportTicket(@PathVariable Integer idRequest, @RequestBody SupportTicket ticketRequest) {
+        supportService.partialUpdate(idRequest, ticketRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Ticket partially updated"));
     }
 
     @DeleteMapping("/{idRequest}")
     public ResponseEntity<MessageResponse> removeSupportTicket(@PathVariable Integer idRequest) {
-        SupportTicket validation = supportService.findById(idRequest);
-        if (validation == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Ticket not found"));
-        }
         supportService.remove(idRequest);
         return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Ticket removed"));
     }

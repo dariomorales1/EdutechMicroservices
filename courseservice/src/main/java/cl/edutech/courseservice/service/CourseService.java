@@ -41,7 +41,9 @@ public class CourseService {
         Course existing = findById(id);
 
         existing.setNameCourse(courseRequest.getNameCourse());
+        existing.setTitle(courseRequest.getTitle());
         existing.setDescription(courseRequest.getDescription());
+        existing.setImageName(courseRequest.getImageName());
         existing.setPrice(courseRequest.getPrice());
 
         courseRepository.save(existing);
@@ -53,8 +55,14 @@ public class CourseService {
         if (courseRequest.getNameCourse() != null) {
             existing.setNameCourse(courseRequest.getNameCourse());
         }
+        if (courseRequest.getTitle() != null) {
+            existing.setTitle(courseRequest.getTitle());
+        }
         if (courseRequest.getDescription() != null) {
             existing.setDescription(courseRequest.getDescription());
+        }
+        if (courseRequest.getImageName() != null) {
+            existing.setImageName(courseRequest.getImageName());
         }
         if (courseRequest.getPrice() != null) {
             existing.setPrice(courseRequest.getPrice());

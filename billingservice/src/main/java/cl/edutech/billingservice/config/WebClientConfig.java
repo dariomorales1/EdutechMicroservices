@@ -8,26 +8,31 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     @Bean
-    public WebClient userWebClient() {
-        return WebClient.builder()
-                //.baseUrl("http://apigateway:8080/users")  //#<<<<<<<-------DOCKER
-                .baseUrl("http://localhost:8080/users")    //#<<<<<<<-------LOCAL
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
+    }
+
+    @Bean
+    public WebClient userWebClient(WebClient.Builder builder) {
+        return builder
+                // .baseUrl("http://apigateway:8080/users") // <<-- DOCKER
+                .baseUrl("http://localhost:8080/users")     // <<-- LOCAL
                 .build();
     }
 
     @Bean
-    public WebClient courseWebClient() {
-        return WebClient.builder()
-                //.baseUrl("http://apigateway:8080/courses")  //#<<<<<<<-------DOCKER
-                .baseUrl("http://localhost:8080/courses")    //#<<<<<<<-------LOCAL
+    public WebClient courseWebClient(WebClient.Builder builder) {
+        return builder
+                // .baseUrl("http://apigateway:8080/courses")
+                .baseUrl("http://localhost:8080/courses")
                 .build();
     }
 
     @Bean
-    public WebClient enrollmentWebClient() {
-        return WebClient.builder()
-                //.baseUrl("http://apigateway:8080/enroll") //#<<<<<<<-------DOCKER
-                .baseUrl("http://localhost:8080/enroll")   //#<<<<<<<-------LOCAL
+    public WebClient enrollmentWebClient(WebClient.Builder builder) {
+        return builder
+                // .baseUrl("http://apigateway:8080/enroll")
+                .baseUrl("http://localhost:8080/enroll")
                 .build();
     }
 }

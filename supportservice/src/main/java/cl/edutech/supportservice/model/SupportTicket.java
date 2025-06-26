@@ -1,32 +1,29 @@
 package cl.edutech.supportservice.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
-@Getter
-@Setter
+@Entity
+@Table(name = "support_tickets")
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Entity
-@Table(name = "supports")
+@Getter
+@Setter
 public class SupportTicket {
 
     @Id
     private Integer id;
 
-    @Column
+    @Column(nullable = false)
     private String userRut;
 
-    @Column
+    @Column(nullable = false)
     private String courseId;
 
-    @Column
+    @Column(nullable = false)
+    private String subject;
+
+    @Column(nullable = false)
     private String description;
 
-    @Column
-    private String status;
 }

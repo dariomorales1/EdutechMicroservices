@@ -77,25 +77,11 @@ public class BillingController {
     }
 
     @PutMapping("/{billingId}")
-    public ResponseEntity<MessageResponse> updateBilling(@PathVariable Integer billingId, @RequestBody Billing billingRequest) {
-        Billing billingExists = billingService.findById(billingId);
-        if (billingExists == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("BILLING NOT FOUND"));
-        }
-        UserDTO user = billingService.getUser(billingRequest.getUserId());
-        CourseDTO course = billingService.getCourse(billingRequest.getCourseId());
-        EnrollmentDTO enroll = billingService.getEnrollment(billingRequest.getEnrollmentId());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("USER NOT FOUND"));
-        } else if (course == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("COURSE NOT FOUND"));
-        } else if (enroll == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("ENROLLMENT NOT FOUND"));
-        } else {
-            billingService.remove(billingId);
-            billingService.create(billingRequest);
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("BILLING UPDATED"));
-        }
+    public ResponseEntity<MessageResponse> updateBilling(
+            @PathVariable Integer billingId,
+            @RequestBody Billing billingRequest) {
+        billingService.update(billingId, billingRequest);
+        return ResponseEntity.ok(new MessageResponse("BILLING UPDATED"));
     }
 
     @DeleteMapping("/{billingId}")
@@ -114,4 +100,5 @@ public class BillingController {
         billingService.partialUpdate(billingId, billingRequest);
         return ResponseEntity.ok(new MessageResponse("BILLING PARTIALLY UPDATED"));
     }
+
 }

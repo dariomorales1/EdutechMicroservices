@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class CourseDTO {
     private String courseId;
     private String nameCourse;
+    private String title;
     private String description;
+    private String imageName;
     private Integer price;
 }
