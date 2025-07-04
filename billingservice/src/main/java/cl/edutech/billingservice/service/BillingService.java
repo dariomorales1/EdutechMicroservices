@@ -46,12 +46,12 @@ public class BillingService {
             throw new NotFoundException("COURSE NOT FOUND");
         }
 
-        Integer price = course.getPrice(); //se obtiene el precio del curso desde CourseService
+        Integer price = course.getPrice();
         if (price == null) {
             throw new ConflictException("COURSE PRICE NOT FOUND");
         }
 
-        int amountWithTax = (int) Math.round(price * 1.19); //calculo del monto con IVA (19%)
+        int amountWithTax = (int) Math.round(price * 1.19);
 
         billing.setAmount(amountWithTax);
 
