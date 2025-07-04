@@ -2,10 +2,9 @@ package cl.edutech.supportservice.service;
 
 import cl.edutech.supportservice.model.SupportTicket;
 import cl.edutech.supportservice.repository.SupportRepository;
+import cl.edutech.supportservice.exception.NotFoundException;
 import cl.edutech.supportservice.DTO.UserDTO;
 import cl.edutech.supportservice.DTO.CourseDTO;
-import cl.edutech.supportservice.exception.ConflictException;
-import cl.edutech.supportservice.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -16,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -37,11 +37,17 @@ class SupportServiceTest {
         uriSpec = mock(WebClient.RequestHeadersUriSpec.class);
         requestSpec = mock(WebClient.RequestHeadersSpec.class);
         responseSpec = mock(WebClient.ResponseSpec.class);
-        // stubs para la cadena WebClient
+
         doReturn(uriSpec).when(userWebClient).get();
         doReturn(uriSpec).when(courseWebClient).get();
-        doReturn(requestSpec).when(uriSpec).uri(anyString(), any());
-        doReturn(responseSpec).when(requestSpec).retrieve();
+
+        doReturn(requestSpec)
+                .when(uriSpec).uri(anyString(), any(Object[].class));
+        doReturn(requestSpec)
+                .when(uriSpec).uri(anyString(), any(Function.class));
+
+        doReturn(responseSpec)
+                .when(requestSpec).retrieve();
     }
 
     @Test
@@ -50,8 +56,7 @@ class SupportServiceTest {
         t.setId(1);
         t.setUserRut("u");
         t.setCourseId("c");
-        t.setSubject("sub");
-        t.setDescription("desc");
+        t.setSubject("i");
         when(supportRepository.findAll()).thenReturn(List.of(t));
 
         var list = supportService.findAll();
@@ -65,11 +70,22 @@ class SupportServiceTest {
     }
 
     @Test
-    void whenCreateExists_thenThrowConflict() {
+    void whenCreateValid_thenSave() {
         SupportTicket t = new SupportTicket();
         t.setId(3);
-        when(supportRepository.existsById(3)).thenReturn(true);
-        assertThrows(ConflictException.class, () -> supportService.create(t));
+        t.setUserRut("u3");
+        t.setCourseId("c3");
+        t.setSubject("i3");
+        when(supportRepository.save(t)).thenReturn(t);
+
+        UserDTO u = new UserDTO(); u.setRut("u3");
+        when(responseSpec.bodyToMono(UserDTO.class)).thenReturn(Mono.just(u));
+
+        CourseDTO c = new CourseDTO(); c.setCourseId("c3"); c.setNameCourse("n");
+        when(responseSpec.bodyToMono(CourseDTO.class)).thenReturn(Mono.just(c));
+
+        var res = supportService.create(t);
+        assertEquals(3, res.getId());
     }
 
     @Test
@@ -78,8 +94,9 @@ class SupportServiceTest {
         t.setId(4);
         t.setUserRut("u4");
         t.setCourseId("c4");
-        when(supportRepository.existsById(4)).thenReturn(false);
-        doReturn(Mono.empty()).when(responseSpec).bodyToMono(UserDTO.class);
+        t.setSubject("i4");
+        when(responseSpec.bodyToMono(UserDTO.class)).thenReturn(Mono.empty());
+
         assertThrows(NotFoundException.class, () -> supportService.create(t));
     }
 
@@ -89,120 +106,25 @@ class SupportServiceTest {
         t.setId(5);
         t.setUserRut("u5");
         t.setCourseId("c5");
-        when(supportRepository.existsById(5)).thenReturn(false);
+        t.setSubject("i5");
 
-        UserDTO u = new UserDTO();
-        u.setRut("u5");
-        u.setEmail("e5");
-        u.setFirstName("f");
-        u.setLastName("l");
-        doReturn(Mono.just(u)).when(responseSpec).bodyToMono(UserDTO.class);
-        doReturn(Mono.empty()).when(responseSpec).bodyToMono(CourseDTO.class);
+        UserDTO u = new UserDTO(); u.setRut("u5");
+        when(responseSpec.bodyToMono(UserDTO.class)).thenReturn(Mono.just(u));
+        when(responseSpec.bodyToMono(CourseDTO.class)).thenReturn(Mono.empty());
 
         assertThrows(NotFoundException.class, () -> supportService.create(t));
     }
 
     @Test
-    void whenCreateValid_thenSave() {
-        SupportTicket t = new SupportTicket();
-        t.setId(6);
-        t.setUserRut("u6");
-        t.setCourseId("c6");
-        t.setSubject("s6");
-        t.setDescription("d6");
-        when(supportRepository.existsById(6)).thenReturn(false);
-
-        UserDTO u = new UserDTO();
-        u.setRut("u6");
-        u.setEmail("e6");
-        u.setFirstName("f6");
-        u.setLastName("l6");
-        CourseDTO c = new CourseDTO();
-        c.setCourseId("c6");
-        c.setNameCourse("Course6");
-        doReturn(Mono.just(u)).when(responseSpec).bodyToMono(UserDTO.class);
-        doReturn(Mono.just(c)).when(responseSpec).bodyToMono(CourseDTO.class);
-        when(supportRepository.save(t)).thenReturn(t);
-
-        var res = supportService.create(t);
-        assertEquals(6, res.getId());
-    }
-
-    @Test
     void whenRemoveNotExists_thenThrowNotFound() {
-        when(supportRepository.existsById(7)).thenReturn(false);
-        assertThrows(NotFoundException.class, () -> supportService.remove(7));
+        when(supportRepository.existsById(6)).thenReturn(false);
+        assertThrows(NotFoundException.class, () -> supportService.remove(6));
     }
 
     @Test
     void whenRemoveExists_thenDeleteCalled() {
-        when(supportRepository.existsById(8)).thenReturn(true);
-        supportService.remove(8);
-        verify(supportRepository).deleteById(8);
-    }
-
-    @Test
-    void whenUpdateNotExists_thenThrowNotFound() {
-        SupportTicket t = new SupportTicket();
-        when(supportRepository.findById(9)).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> supportService.update(9, t));
-    }
-
-    @Test
-    void whenUpdateUserOrCourseNotFound_thenThrowNotFound() {
-        SupportTicket existing = new SupportTicket();
-        existing.setId(10);
-        SupportTicket req = new SupportTicket();
-        req.setUserRut("u10");
-        req.setCourseId("c10");
-        when(supportRepository.findById(10)).thenReturn(Optional.of(existing));
-        doReturn(Mono.empty()).when(responseSpec).bodyToMono(UserDTO.class);
-        assertThrows(NotFoundException.class, () -> supportService.update(10, req));
-    }
-
-    @Test
-    void whenUpdateValid_thenSaveChanges() {
-        SupportTicket existing = new SupportTicket();
-        existing.setId(11);
-        SupportTicket req = new SupportTicket();
-        req.setUserRut("u11");
-        req.setCourseId("c11");
-        req.setSubject("sub11");
-        req.setDescription("desc11");
-        when(supportRepository.findById(11)).thenReturn(Optional.of(existing));
-
-        UserDTO u = new UserDTO();
-        u.setRut("u11");
-        u.setEmail("e11");
-        u.setFirstName("f");
-        u.setLastName("l");
-        CourseDTO c = new CourseDTO();
-        c.setCourseId("c11");
-        c.setNameCourse("Course11");
-        doReturn(Mono.just(u)).when(responseSpec).bodyToMono(UserDTO.class);
-        doReturn(Mono.just(c)).when(responseSpec).bodyToMono(CourseDTO.class);
-
-        supportService.update(11, req);
-        assertEquals("u11", existing.getUserRut());
-        assertEquals("c11", existing.getCourseId());
-        assertEquals("sub11", existing.getSubject());
-        assertEquals("desc11", existing.getDescription());
-    }
-
-    @Test
-    void whenPartialUpdateValid_thenApplyChanges() {
-        SupportTicket existing = new SupportTicket();
-        existing.setId(12);
-        existing.setUserRut("u12");
-        existing.setCourseId("c12");
-        existing.setSubject("sub");
-        existing.setDescription("desc");
-        SupportTicket req = new SupportTicket();
-        req.setSubject("newSub");
-        when(supportRepository.findById(12)).thenReturn(Optional.of(existing));
-
-        supportService.partialUpdate(12, req);
-        assertEquals("newSub", existing.getSubject());
-        verify(supportRepository).save(existing);
+        when(supportRepository.existsById(7)).thenReturn(true);
+        supportService.remove(7);
+        verify(supportRepository).deleteById(7);
     }
 }

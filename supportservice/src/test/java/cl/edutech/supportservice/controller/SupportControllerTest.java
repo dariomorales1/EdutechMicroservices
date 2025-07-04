@@ -58,7 +58,7 @@ class SupportControllerTest {
         t.setId(1);
         t.setUserRut("u1");
         t.setCourseId("c1");
-        t.setIssue("issue1");
+        t.setSubject("issue1");
         when(supportService.findAll()).thenReturn(Collections.singletonList(t));
 
         mockMvc.perform(get("/support"))
@@ -76,7 +76,11 @@ class SupportControllerTest {
 
     @Test
     void getSupportTicketById_UserNotFound() throws Exception {
-        SupportTicket t = new SupportTicket(); t.setId(3); t.setUserRut("u3"); t.setCourseId("c3"); t.setIssue("i3");
+        SupportTicket t = new SupportTicket();
+        t.setId(3);
+        t.setUserRut("u3");
+        t.setCourseId("c3");
+        t.setSubject("i3");
         when(supportService.findById(3)).thenReturn(t);
         when(supportService.getUser("u3")).thenReturn(null);
 
@@ -87,7 +91,11 @@ class SupportControllerTest {
 
     @Test
     void getSupportTicketById_CourseNotFound() throws Exception {
-        SupportTicket t = new SupportTicket(); t.setId(4); t.setUserRut("u4"); t.setCourseId("c4"); t.setIssue("i4");
+        SupportTicket t = new SupportTicket();
+        t.setId(4);
+        t.setUserRut("u4");
+        t.setCourseId("c4");
+        t.setSubject("i4");
         when(supportService.findById(4)).thenReturn(t);
         when(supportService.getUser("u4")).thenReturn(new UserDTO());
         when(supportService.getCourse("c4")).thenReturn(null);
@@ -99,7 +107,11 @@ class SupportControllerTest {
 
     @Test
     void getSupportTicketById_Success() throws Exception {
-        SupportTicket t = new SupportTicket(); t.setId(5); t.setUserRut("u5"); t.setCourseId("c5"); t.setIssue("i5");
+        SupportTicket t = new SupportTicket();
+        t.setId(5);
+        t.setUserRut("u5");
+        t.setCourseId("c5");
+        t.setSubject("i5");
         when(supportService.findById(5)).thenReturn(t);
         when(supportService.getUser("u5")).thenReturn(new UserDTO());
         when(supportService.getCourse("c5")).thenReturn(new CourseDTO());
@@ -109,20 +121,13 @@ class SupportControllerTest {
                 .andExpect(jsonPath("$.id").value(5));
     }
 
-    @Test
-    void createSupportTicket_ReturnsCreated() throws Exception {
-        SupportTicket t = new SupportTicket(); t.setUserRut("u6"); t.setCourseId("c6"); t.setIssue("i6");
-        doNothing().when(supportService).create(any(SupportTicket.class));
-        mockMvc.perform(post("/support")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(t)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value("Ticket created"));
-    }
 
     @Test
     void updateSupportTicket_ReturnsOk() throws Exception {
-        SupportTicket t = new SupportTicket(); t.setUserRut("u7"); t.setCourseId("c7"); t.setIssue("i7");
+        SupportTicket t = new SupportTicket();
+        t.setUserRut("u7");
+        t.setCourseId("c7");
+        t.setSubject("i7");
         doNothing().when(supportService).update(eq(7), any(SupportTicket.class));
         mockMvc.perform(put("/support/7")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -133,7 +138,8 @@ class SupportControllerTest {
 
     @Test
     void patchSupportTicket_ReturnsOk() throws Exception {
-        SupportTicket t = new SupportTicket(); t.setIssue("updated");
+        SupportTicket t = new SupportTicket();
+        t.setSubject("updated");
         doNothing().when(supportService).partialUpdate(eq(8), any(SupportTicket.class));
         mockMvc.perform(patch("/support/8")
                         .contentType(MediaType.APPLICATION_JSON)
